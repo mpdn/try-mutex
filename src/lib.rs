@@ -84,6 +84,7 @@ impl<T> TryMutex<T> {
 impl<T> UnwindSafe for TryMutex<T> { }
 impl<T> RefUnwindSafe for TryMutex<T> { }
 unsafe impl<T> Sync for TryMutex<T> { }
+unsafe impl<'a, T> Sync for TryMutexGuard<'a, T> { }
 
 impl<T> From<T> for TryMutex<T> {
     fn from(t: T) -> Self {

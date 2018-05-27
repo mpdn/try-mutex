@@ -52,3 +52,17 @@ fn only_one_lock() {
 
     assert!(*m.try_lock().unwrap() == true)
 }
+
+fn sync<T: Sync>(_: T) {}
+
+#[test]
+fn mutex_is_sync() {
+    let m = TryMutex::new(false);
+    sync(m.try_lock().unwrap());
+}
+
+#[test]
+fn guard_is_sync() {
+    let m = TryMutex::new(false);
+    sync(m.try_lock().unwrap());
+}
