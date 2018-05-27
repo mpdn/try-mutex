@@ -1,6 +1,6 @@
 [package]
 name = "try-mutex"
-version = "0.1.0"
+version = "0.1.1"
 description = "Fast non-blocking mutex"
 categories = ["concurrency"]
 authors = ["Mike Pedersen <mike@mikepedersen.dk>"]
