@@ -1,14 +1,14 @@
-///! Provides a simple mutex that does not support blocking or poisoning, but is
-///! faster and simpler than the mutex in stdlib.
+//! Provides a simple mutex that does not support blocking or poisoning, but is
+//! faster and simpler than the mutex in stdlib.
 
-use std::convert::From;
 use std::cell::UnsafeCell;
-use std::ops::{Deref, DerefMut};
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::marker::PhantomData;
-use std::panic::{UnwindSafe, RefUnwindSafe};
+use std::convert::From;
 use std::fmt;
 use std::fmt::{Debug, Display};
+use std::marker::PhantomData;
+use std::ops::{Deref, DerefMut};
+use std::panic::{RefUnwindSafe, UnwindSafe};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// A mutual exclusion primitive that does not support blocking or poisoning.
 /// This results in a simpler and faster implementation.
@@ -18,9 +18,9 @@ pub struct TryMutex<T> {
 }
 
 impl<T> TryMutex<T> {
-    /// Create a new mutex in unlocked state
+    /// Create a new mutex in unlocked state.
     #[inline]
-    pub fn new(t: T) -> TryMutex<T> {
+    pub const fn new(t: T) -> Self {
         TryMutex {
             data: UnsafeCell::new(t),
             locked: AtomicBool::new(false),
@@ -35,14 +35,14 @@ impl<T> TryMutex<T> {
         if self.locked.compare_and_swap(false, true, Ordering::Acquire) {
             None
         } else {
-            Some(TryMutexGuard{
+            Some(TryMutexGuard {
                 lock: self,
                 notsend: PhantomData,
             })
         }
     }
 
-    // Consumes this mutex, returning the underlying data.
+    /// Consumes this mutex, returning the underlying data.
     #[inline]
     pub fn into_inner(self) -> T {
         self.data.into_inner()
@@ -58,30 +58,32 @@ impl<T> TryMutex<T> {
 
 impl<T: Default> Default for TryMutex<T> {
     fn default() -> Self {
-        TryMutex::new(T::default())
+        Self::new(T::default())
     }
 }
 
 impl<T: Debug> Debug for TryMutex<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(guard) = self.try_lock() {
-            f.debug_struct("TryMutex")
-                .field("data", &*guard)
-                .finish()
+            f.debug_struct("TryMutex").field("data", &*guard).finish()
         } else {
             struct LockedPlaceholder;
             impl fmt::Debug for LockedPlaceholder {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_str("<locked>") }
+                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                    f.write_str("<locked>")
+                }
             }
 
-            f.debug_struct("TryMutex").field("data", &LockedPlaceholder).finish()
+            f.debug_struct("TryMutex")
+                .field("data", &LockedPlaceholder)
+                .finish()
         }
     }
 }
 
 /// A RAII scoped lock on a `TryMutex`. When this this structure is dropped, the
 /// mutex will be unlocked.
-pub struct TryMutexGuard<'a, T: 'a>{
+pub struct TryMutexGuard<'a, T: 'a> {
     lock: &'a TryMutex<T>,
     notsend: PhantomData<*mut T>,
 }
@@ -120,10 +122,10 @@ impl<'a, T: Display> Display for TryMutexGuard<'a, T> {
     }
 }
 
-impl<T> UnwindSafe for TryMutex<T> { }
-impl<T> RefUnwindSafe for TryMutex<T> { }
-unsafe impl<T> Sync for TryMutex<T> { }
-unsafe impl<'a, T> Sync for TryMutexGuard<'a, T> { }
+impl<T> UnwindSafe for TryMutex<T> {}
+impl<T> RefUnwindSafe for TryMutex<T> {}
+unsafe impl<T> Sync for TryMutex<T> {}
+unsafe impl<'a, T: Sync> Sync for TryMutexGuard<'a, T> {}
 
 impl<T> From<T> for TryMutex<T> {
     fn from(t: T) -> Self {

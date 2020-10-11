@@ -1,22 +1,7 @@
-extern crate compiletest_rs as compiletest;
-extern crate try_mutex;
-
-use std::thread;
 use std::sync::Arc;
-use std::path::PathBuf;
-use try_mutex::TryMutex;
-
-#[test]
-fn compile_test() {
-    let mut config = compiletest::Config::default();
-
-    config.mode = "compile-fail".parse().expect("Invalid mode");
-    config.src_base = PathBuf::from("tests/compile-fail");
-    config.link_deps(); 
-    config.clean_rmeta();
-
-    compiletest::run_tests(&config);
-}
+use std::thread;
+use try_mutex::{TryMutex, TryMutexGuard};
+use static_assertions::{assert_impl_all, assert_not_impl_any};
 
 #[test]
 fn get_mut() {
@@ -36,8 +21,12 @@ fn single_thread() {
 fn across_threads() {
     let a = Arc::new(TryMutex::new(false));
     let b = a.clone();
-    thread::spawn(move || { *a.try_lock().unwrap() = true; }).join().unwrap();
-    assert!(*b.try_lock().unwrap() == true);
+    thread::spawn(move || {
+        *a.try_lock().unwrap() = true;
+    })
+    .join()
+    .unwrap();
+    assert!(*b.try_lock().unwrap());
 }
 
 #[test]
@@ -50,19 +39,9 @@ fn only_one_lock() {
         *a = true;
     }
 
-    assert!(*m.try_lock().unwrap() == true)
+    assert!(*m.try_lock().unwrap())
 }
 
-fn sync<T: Sync>(_: T) {}
-
-#[test]
-fn mutex_is_sync() {
-    let m = TryMutex::new(false);
-    sync(m.try_lock().unwrap());
-}
-
-#[test]
-fn guard_is_sync() {
-    let m = TryMutex::new(false);
-    sync(m.try_lock().unwrap());
-}
+assert_impl_all!(TryMutex<bool>: Sync);
+assert_impl_all!(TryMutexGuard<'static, bool>: Sync);
+assert_not_impl_any!(TryMutexGuard<'static, bool>: Send);
