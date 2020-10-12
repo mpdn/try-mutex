@@ -1,13 +1,13 @@
 [package]
 name = "try-mutex"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2018"
 description = "Fast non-blocking mutex"
 categories = ["concurrency"]
 authors = ["Mike Pedersen <mike@mikepedersen.dk>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/noctune/try-mutex"
+repository = "https://github.com/mpdn/try-mutex"
 
 [[bench]]
 name = "bench"
