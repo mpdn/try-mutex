@@ -1,9 +1,8 @@
-extern crate try_mutex;
-#[macro_use] extern crate criterion;
+#![allow(clippy::mutex_atomic)]
 
+use criterion::{black_box, Criterion, criterion_group, criterion_main};
 use std::sync::Mutex;
 use try_mutex::TryMutex;
-use criterion::{Criterion, black_box};
 
 fn build_try() {
     for _ in 0..100000 {
