@@ -124,7 +124,8 @@ impl<'a, T: Display> Display for TryMutexGuard<'a, T> {
 
 impl<T> UnwindSafe for TryMutex<T> {}
 impl<T> RefUnwindSafe for TryMutex<T> {}
-unsafe impl<T> Sync for TryMutex<T> {}
+unsafe impl<T: Send> Send for TryMutex<T> {}
+unsafe impl<T: Send> Sync for TryMutex<T> {}
 unsafe impl<'a, T: Sync> Sync for TryMutexGuard<'a, T> {}
 
 impl<T> From<T> for TryMutex<T> {
