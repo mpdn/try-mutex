@@ -31,15 +31,14 @@ impl<T> TryMutex<T> {
     /// locked, `None` is returned. Otherwise a RAII guard is returned. The lock
     /// will be unlocked when the guard is dropped.
     #[inline]
-    pub fn try_lock(&self) -> Option<TryMutexGuard<T>> {
-        if self.locked.compare_and_swap(false, true, Ordering::Acquire) {
-            None
-        } else {
-            Some(TryMutexGuard {
+    pub fn try_lock(&self) -> Option<TryMutexGuard<'_, T>> {
+        self.locked
+            .compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed)
+            .ok()
+            .map(|_| TryMutexGuard {
                 lock: self,
                 notsend: PhantomData,
             })
-        }
     }
 
     /// Consumes this mutex, returning the underlying data.
