@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::thread;
 use try_mutex::{TryMutex, TryMutexGuard};
-use static_assertions::{assert_impl_all, assert_not_impl_any};
+use static_assertions::assert_impl_all;
 
 #[test]
 fn get_mut() {
@@ -44,4 +44,4 @@ fn only_one_lock() {
 
 assert_impl_all!(TryMutex<bool>: Sync);
 assert_impl_all!(TryMutexGuard<'static, bool>: Sync);
-assert_not_impl_any!(TryMutexGuard<'static, bool>: Send);
+assert_impl_all!(TryMutexGuard<'static, bool>: Send);
