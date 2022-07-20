@@ -110,7 +110,7 @@ impl<'a, T> Drop for TryMutexGuard<'a, T> {
 impl<'a, T: Debug> Debug for TryMutexGuard<'a, T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("TryMutexGuard")
-            .field("data", &*self)
+            .field("data", &**self)
             .finish()
     }
 }
