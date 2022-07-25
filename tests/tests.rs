@@ -42,6 +42,18 @@ fn only_one_lock() {
     assert!(*m.try_lock().unwrap())
 }
 
+#[test]
+fn debug_print() {
+    println!("{:?}", TryMutex::new(false));
+}
+
+
+#[test]
+fn debug_print_guard() {
+    let m = TryMutex::new(false);
+    println!("{:?}", m.try_lock().unwrap());
+}
+
 assert_impl_all!(TryMutex<bool>: Sync);
 assert_impl_all!(TryMutexGuard<'static, bool>: Sync);
 assert_impl_all!(TryMutexGuard<'static, bool>: Send);
