@@ -1,14 +1,16 @@
 //! Provides a simple mutex that does not support blocking or poisoning, but is
 //! faster and simpler than the mutex in stdlib.
 
-use std::cell::UnsafeCell;
-use std::convert::From;
-use std::fmt;
-use std::fmt::{Debug, Display};
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
-use std::panic::{RefUnwindSafe, UnwindSafe};
-use std::sync::atomic::{AtomicBool, Ordering};
+#![no_std]
+
+use core::cell::UnsafeCell;
+use core::convert::From;
+use core::fmt;
+use core::fmt::{Debug, Display};
+use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut};
+use core::panic::{RefUnwindSafe, UnwindSafe};
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// A mutual exclusion primitive that does not support blocking or poisoning.
 /// This results in a simpler and faster implementation.
