@@ -1,6 +1,6 @@
 [package]
 name = "try-mutex"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2018"
 description = "Fast non-blocking mutex"
 categories = ["concurrency", "no-std"]
